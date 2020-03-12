@@ -8,6 +8,46 @@ plt.show()"""
 import numpy as np
 import pygame
 
+class Cell:
+    def __init__(self, value, mine_value, state):
+        self.value = value
+        self.mine_value = mine_value
+        self.state = state
+
+    def __str__(self):
+        cell_str = '{value: ' + str(self.value) + ', state: ' + str(self.state) + '}'
+        return cell_str
+
+def fill_grid_backend(grid):
+    # go to each mine
+    # circle the mine
+        # for each cell around the mine, if its not a mine itself
+            # inc the mine value
+
+
+def get_mine_count(row, col, dim):
+
+
+
+
+
+
+
+
+def fill_grid_frontend(grid):
+    zero = pygame.image.load('./images/0.png')
+    one = pygame.image.load('./images/1.png')
+    two = pygame.image.load('./images/2.png')
+    three = pygame.image.load('./images/3.png')
+    four = pygame.image.load('./images/4.png')
+    five = pygame.image.load('./images/5.png')
+    six = pygame.image.load('./images/6.png')
+    seven = pygame.image.load('./images/7.png')
+    eight = pygame.image.load('./images/8.png')
+
+
+
+
 def main():
 
     # SETUP GRID
@@ -29,16 +69,18 @@ def main():
     # array is simply a list of lists.
     grid = []
     # Get dimension input
-    dim = int(input('Enter dimension: '))
+    #dim = int(input('Enter dimension: '))
+    dim = 10
 
     for row in range(dim):
         # Add an empty array that will hold each cell
         # in this row
         grid.append([])
         for column in range(dim):
-            grid[row].append(np.random.binomial(1, 0.125, 1))  # Append a cell
+            cell = Cell(np.random.binomial(1, 0.125, 1), False)
+            grid[row].append(cell)  # Append a cell
 
-    print(grid)
+    #print(grid)
 
     pygame.init()
 
@@ -73,13 +115,14 @@ def main():
         # background image.
         screen.fill(BACKGROUND)
 
+
         # --- Drawing code should go here
         # Draw the grid
         for row in range(10):
             for column in range(10):
                 color = WHITE
-                if grid[row][column] == 1:
-                    color = GREEN
+                if grid[row][column].value == 1:
+                    color = BLACK
                 pygame.draw.rect(screen,
                                  color,
                                  [(MARGIN + WIDTH) * column + MARGIN,
