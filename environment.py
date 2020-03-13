@@ -26,7 +26,7 @@ def print_grid(grid):
             print(str(grid[row][col]))
 
 
-def update_cell_values(grid):
+def update_values_backend(grid):
     # go to each mine
     # circle the mine
         # for each cell around the mine, if its not a mine itself
@@ -54,7 +54,7 @@ def valid(row, col, dim):
         return False
 
 
-def fill_grid_frontend(grid):
+def update_values_frontend(grid, screen):
     zero = pygame.image.load('./images/0.png')
     one = pygame.image.load('./images/1.png')
     two = pygame.image.load('./images/2.png')
@@ -65,7 +65,31 @@ def fill_grid_frontend(grid):
     seven = pygame.image.load('./images/7.png')
     eight = pygame.image.load('./images/8.png')
 
+    dim = len(grid)
+    x = 0
+    y = 0
+    for row in range(dim):
+        if row > 0:
+            y += 40
+        for col in range(dim):
+            x += 40
+            print('x: ' + str(x) + ' y: ' + str(y))
+            if grid[row][col].value == 0:
+                pygame.Surface.blit(zero, screen, (x, y))
+            """if grid[row][col].value == 1:
+            if grid[row][col].value == 2:
+            if grid[row][col].value == 3:
+            if grid[row][col].value == 4:
+            if grid[row][col].value == 5:
+            if grid[row][col].value == 6:
+            if grid[row][col].value == 7:
+            if grid[row][col].value == 8:"""
 
+
+def image_display(screen, filename, xy):
+    img = pygame.image.load(filename)
+    img = pygame.transform.scale(img, (40, 40))
+    screen.blit(img, xy)
 
 
 def main():
@@ -100,8 +124,8 @@ def main():
             cell = Cell(0, np.random.binomial(1, 0.125, 1), False)
             grid[row].append(cell)  # Append a cell
 
-    grid = update_cell_values(grid)
-    print_grid(grid)
+    grid = update_values_backend(grid)
+    #print_grid(grid)
 
     pygame.init()
 
@@ -109,7 +133,7 @@ def main():
     size = ((MARGIN + WIDTH) * dim + MARGIN, (MARGIN + WIDTH) * dim + MARGIN)
     screen = pygame.display.set_mode(size)
 
-    pygame.display.set_caption("Maze Runner")
+    pygame.display.set_caption("Minesweeper")
 
     # Loop until the user clicks the close button.
     done = False
@@ -138,18 +162,54 @@ def main():
 
 
         # --- Drawing code should go here
+        """zero = pygame.image.load('./images/0.png')
+        one = pygame.image.load('./images/1.png')
+        two = pygame.image.load('./images/2.png')
+        three = pygame.image.load('./images/3.png')
+        four = pygame.image.load('./images/4.png')
+        five = pygame.image.load('./images/5.png')
+        six = pygame.image.load('./images/6.png')p
+        seven = pygame.image.load('./images/7.png')
+        eight = pygame.image.load('./images/8.png')"""
+
+        x = 5
+        y = 5
         # Draw the grid
         for row in range(10):
-            for column in range(10):
+            if row > 0:
+                y += 45
+            for col in range(10):
                 color = WHITE
-                if grid[row][column].mine_value == 1:
+                if grid[row][col].mine_value == 1:
                     color = BLACK
                 pygame.draw.rect(screen,
                                  color,
-                                 [(MARGIN + WIDTH) * column + MARGIN,
+                                 [(MARGIN + WIDTH) * col + MARGIN,
                                   (MARGIN + HEIGHT) * row + MARGIN,
                                   WIDTH,
                                   HEIGHT])
+
+                if grid[row][col].value == 0:
+                    image_display(screen, './images/0.png', (x,y))
+                if grid[row][col].value == 1:
+                    image_display(screen, './images/1.png', (x, y))
+                if grid[row][col].value == 2:
+                    image_display(screen, './images/2.png', (x, y))
+                if grid[row][col].value == 3:
+                    image_display(screen, './images/3.png', (x, y))
+                if grid[row][col].value == 4:
+                    image_display(screen, './images/4.png', (x, y))
+                if grid[row][col].value == 5:
+                    image_display(screen, './images/5.png', (x, y))
+                if grid[row][col].value == 6:
+                    image_display(screen, './images/6.png', (x, y))
+                if grid[row][col].value == 7:
+                    image_display(screen, './images/7.png', (x, y))
+                if grid[row][col].value == 8:
+                    image_display(screen, './images/8.png', (x, y))
+
+                x += 45
+
 
         # --- Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
