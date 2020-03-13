@@ -10,28 +10,48 @@ import pygame
 
 class Cell:
     def __init__(self, value, mine_value, state):
-        self.value = value
-        self.mine_value = mine_value
-        self.state = state
+        self.value = value # number of mines adj to this cell
+        self.mine_value = mine_value # 0 if not mine, 1 if mine
+        self.state = state # open or closed
 
     def __str__(self):
-        cell_str = '{value: ' + str(self.value) + ', state: ' + str(self.state) + '}'
+        cell_str = '{value: ' + str(self.value) + ', mine value: ' + str(self.mine_value) +\
+                   ', state: ' + str(self.state) + '}'
         return cell_str
 
-def fill_grid_backend(grid):
+def print_grid(grid):
+    dim = len(grid)
+    for row in range(dim):
+        for col in range(dim):
+            print(str(grid[row][col]))
+
+
+def update_cell_values(grid):
     # go to each mine
     # circle the mine
         # for each cell around the mine, if its not a mine itself
-            # inc the mine value
+            # inc the value
+
+    dim = len(grid)
+    for row in range(dim): # Iterate through rows and cols
+        for col in range(dim):
+            if grid[row][col].mine_value == 1: # If mine found, it is central cell
+                print('row: ' + str(row) + ' col: ' + str(col))
+                for i in range(row-1, row+2):
+                    for j in range(col-1, col+2):
+                        if valid(i, j, dim) and (i != row or j != col): # If ij valid and not central cell
+                            if grid[i][j].mine_value != 1: # If not mine in surrounding circle
+                                grid[i][j].value += 1 # Inc that cell's value
+                                print('i: ' + str(i) + ' j: ' + str(j) + ' value: ' + str(grid[i][j].value))
+
+    return grid
 
 
-def get_mine_count(row, col, dim):
-
-
-
-
-
-
+def valid(row, col, dim):
+    if row >= 0 and col >= 0 and row < dim and col < dim:
+        return True
+    else:
+        return False
 
 
 def fill_grid_frontend(grid):
@@ -77,10 +97,11 @@ def main():
         # in this row
         grid.append([])
         for column in range(dim):
-            cell = Cell(np.random.binomial(1, 0.125, 1), False)
+            cell = Cell(0, np.random.binomial(1, 0.125, 1), False)
             grid[row].append(cell)  # Append a cell
 
-    #print(grid)
+    grid = update_cell_values(grid)
+    print_grid(grid)
 
     pygame.init()
 
@@ -121,7 +142,7 @@ def main():
         for row in range(10):
             for column in range(10):
                 color = WHITE
-                if grid[row][column].value == 1:
+                if grid[row][column].mine_value == 1:
                     color = BLACK
                 pygame.draw.rect(screen,
                                  color,
