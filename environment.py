@@ -23,7 +23,11 @@ def print_grid(grid):
     dim = len(grid)
     for row in range(dim):
         for col in range(dim):
-            print(str(grid[row][col]))
+            if grid[row][col].mine_value == 1:
+                print('M', end=' ')
+            else:
+                print(str(grid[row][col].value), end=' ')
+        print('')
 
 
 def update_values_backend(grid):
@@ -36,13 +40,13 @@ def update_values_backend(grid):
     for row in range(dim): # Iterate through rows and cols
         for col in range(dim):
             if grid[row][col].mine_value == 1: # If mine found, it is central cell
-                print('row: ' + str(row) + ' col: ' + str(col))
+                #print('row: ' + str(row) + ' col: ' + str(col))
                 for i in range(row-1, row+2):
                     for j in range(col-1, col+2):
                         if valid(i, j, dim) and (i != row or j != col): # If ij valid and not central cell
                             if grid[i][j].mine_value != 1: # If not mine in surrounding circle
                                 grid[i][j].value += 1 # Inc that cell's value
-                                print('i: ' + str(i) + ' j: ' + str(j) + ' value: ' + str(grid[i][j].value))
+                                #print('i: ' + str(i) + ' j: ' + str(j) + ' value: ' + str(grid[i][j].value))
 
     return grid
 
@@ -52,39 +56,6 @@ def valid(row, col, dim):
         return True
     else:
         return False
-
-
-def update_values_frontend(grid, screen):
-    zero = pygame.image.load('./images/0.png')
-    one = pygame.image.load('./images/1.png')
-    two = pygame.image.load('./images/2.png')
-    three = pygame.image.load('./images/3.png')
-    four = pygame.image.load('./images/4.png')
-    five = pygame.image.load('./images/5.png')
-    six = pygame.image.load('./images/6.png')
-    seven = pygame.image.load('./images/7.png')
-    eight = pygame.image.load('./images/8.png')
-
-    dim = len(grid)
-    x = 0
-    y = 0
-    for row in range(dim):
-        if row > 0:
-            y += 40
-        for col in range(dim):
-            x += 40
-            print('x: ' + str(x) + ' y: ' + str(y))
-            if grid[row][col].value == 0:
-                pygame.Surface.blit(zero, screen, (x, y))
-            """if grid[row][col].value == 1:
-            if grid[row][col].value == 2:
-            if grid[row][col].value == 3:
-            if grid[row][col].value == 4:
-            if grid[row][col].value == 5:
-            if grid[row][col].value == 6:
-            if grid[row][col].value == 7:
-            if grid[row][col].value == 8:"""
-
 
 def image_display(screen, filename, xy):
     img = pygame.image.load(filename)
@@ -125,7 +96,7 @@ def main():
             grid[row].append(cell)  # Append a cell
 
     grid = update_values_backend(grid)
-    #print_grid(grid)
+    print_grid(grid)
 
     pygame.init()
 
@@ -162,24 +133,15 @@ def main():
 
 
         # --- Drawing code should go here
-        """zero = pygame.image.load('./images/0.png')
-        one = pygame.image.load('./images/1.png')
-        two = pygame.image.load('./images/2.png')
-        three = pygame.image.load('./images/3.png')
-        four = pygame.image.load('./images/4.png')
-        five = pygame.image.load('./images/5.png')
-        six = pygame.image.load('./images/6.png')p
-        seven = pygame.image.load('./images/7.png')
-        eight = pygame.image.load('./images/8.png')"""
 
         x = 5
         y = 5
         # Draw the grid
-        for row in range(10):
-            if row > 0:
-                y += 45
-            for col in range(10):
+        for row in range(dim):
+            for col in range(dim):
                 color = WHITE
+                if grid[row][col].value == 0:
+                    image_display(screen, './images/0.png', (x,y))
                 if grid[row][col].mine_value == 1:
                     color = BLACK
                 pygame.draw.rect(screen,
@@ -189,27 +151,28 @@ def main():
                                   WIDTH,
                                   HEIGHT])
 
-                if grid[row][col].value == 0:
-                    image_display(screen, './images/0.png', (x,y))
-                if grid[row][col].value == 1:
-                    image_display(screen, './images/1.png', (x, y))
-                if grid[row][col].value == 2:
-                    image_display(screen, './images/2.png', (x, y))
-                if grid[row][col].value == 3:
-                    image_display(screen, './images/3.png', (x, y))
-                if grid[row][col].value == 4:
-                    image_display(screen, './images/4.png', (x, y))
-                if grid[row][col].value == 5:
-                    image_display(screen, './images/5.png', (x, y))
-                if grid[row][col].value == 6:
-                    image_display(screen, './images/6.png', (x, y))
-                if grid[row][col].value == 7:
-                    image_display(screen, './images/7.png', (x, y))
-                if grid[row][col].value == 8:
-                    image_display(screen, './images/8.png', (x, y))
-
+                if grid[row][col].mine_value != 1:# not a mine
+                    if grid[row][col].value == 0:
+                        image_display(screen, './images/0.png', (x,y))
+                    if grid[row][col].value == 1:
+                        image_display(screen, './images/1.png', (x, y))
+                    if grid[row][col].value == 2:
+                        image_display(screen, './images/2.png', (x, y))
+                    if grid[row][col].value == 3:
+                        image_display(screen, './images/3.png', (x, y))
+                    if grid[row][col].value == 4:
+                        image_display(screen, './images/4.png', (x, y))
+                    if grid[row][col].value == 5:
+                        image_display(screen, './images/5.png', (x, y))
+                    if grid[row][col].value == 6:
+                        image_display(screen, './images/6.png', (x, y))
+                    if grid[row][col].value == 7:
+                        image_display(screen, './images/7.png', (x, y))
+                    if grid[row][col].value == 8:
+                        image_display(screen, './images/8.png', (x, y))
                 x += 45
-
+            x = 5
+            y += 45
 
         # --- Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
