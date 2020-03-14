@@ -30,7 +30,7 @@ def print_grid(grid):
         print('')
 
 
-def update_values_backend(grid):
+def update_values(grid):
     # go to each mine
     # circle the mine
         # for each cell around the mine, if its not a mine itself
@@ -57,11 +57,13 @@ def valid(row, col, dim):
     else:
         return False
 
-def image_display(screen, filename, xy):
+def display_image(screen, filename, xy):
     img = pygame.image.load(filename)
     img = pygame.transform.scale(img, (40, 40))
     screen.blit(img, xy)
 
+def open_cell(grid, row, col):
+    grid[row][col].state = True
 
 def main():
 
@@ -71,7 +73,7 @@ def main():
     WHITE = (255, 255, 255)
     GREEN = (0, 255, 0)
     BACKGROUND = (79, 159, 159)
-    RED = (255, 0, 0)
+    MAROON = (128, 0, 0)
 
     # This sets the WIDTH and HEIGHT of each grid location
     WIDTH = 40
@@ -84,18 +86,21 @@ def main():
     # array is simply a list of lists.
     grid = []
     # Get dimension input
-    #dim = int(input('Enter dimension: '))
-    dim = 10
+    dim = int(input('Enter dimension: '))
 
     for row in range(dim):
         # Add an empty array that will hold each cell
         # in this row
         grid.append([])
         for column in range(dim):
-            cell = Cell(0, np.random.binomial(1, 0.125, 1), False)
-            grid[row].append(cell)  # Append a cell
+            if row == 0 and column == 0:
+                cell = Cell(0, 0, False)
+                grid[row].append(cell)
+            else:
+                cell = Cell(0, np.random.binomial(1, 0.125, 1), False)
+                grid[row].append(cell)  # Append a cell
 
-    grid = update_values_backend(grid)
+    grid = update_values(grid)
     print_grid(grid)
 
     pygame.init()
@@ -140,8 +145,6 @@ def main():
         for row in range(dim):
             for col in range(dim):
                 color = WHITE
-                if grid[row][col].value == 0:
-                    image_display(screen, './images/0.png', (x,y))
                 if grid[row][col].mine_value == 1:
                     color = BLACK
                 pygame.draw.rect(screen,
@@ -153,26 +156,37 @@ def main():
 
                 if grid[row][col].mine_value != 1:# not a mine
                     if grid[row][col].value == 0:
-                        image_display(screen, './images/0.png', (x,y))
+                        display_image(screen, './images/0.png', (x,y))
                     if grid[row][col].value == 1:
-                        image_display(screen, './images/1.png', (x, y))
+                        display_image(screen, './images/1.png', (x, y))
                     if grid[row][col].value == 2:
-                        image_display(screen, './images/2.png', (x, y))
+                        display_image(screen, './images/2.png', (x, y))
                     if grid[row][col].value == 3:
-                        image_display(screen, './images/3.png', (x, y))
+                        display_image(screen, './images/3.png', (x, y))
                     if grid[row][col].value == 4:
-                        image_display(screen, './images/4.png', (x, y))
+                        display_image(screen, './images/4.png', (x, y))
                     if grid[row][col].value == 5:
-                        image_display(screen, './images/5.png', (x, y))
+                        display_image(screen, './images/5.png', (x, y))
                     if grid[row][col].value == 6:
-                        image_display(screen, './images/6.png', (x, y))
+                        display_image(screen, './images/6.png', (x, y))
                     if grid[row][col].value == 7:
-                        image_display(screen, './images/7.png', (x, y))
+                        display_image(screen, './images/7.png', (x, y))
                     if grid[row][col].value == 8:
-                        image_display(screen, './images/8.png', (x, y))
+                        display_image(screen, './images/8.png', (x, y))
                 x += 45
+
+                if grid[row][col].state == False:
+                    color = MAROON
+                    pygame.draw.rect(screen,
+                                     color,
+                                     [(MARGIN + WIDTH) * col + MARGIN,
+                                      (MARGIN + HEIGHT) * row + MARGIN,
+                                      WIDTH,
+                                      HEIGHT])
             x = 5
             y += 45
+
+
 
         # --- Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
