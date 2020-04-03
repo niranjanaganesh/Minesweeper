@@ -6,7 +6,8 @@ class Agent:
 
     def start(self):
         # open first cell
-        self.env = self.env.open_cell(self.env, 0, 0)
+        self.env[0][0].state = True
+        return self.env
 
     def naive_solver(self):
         self.start()
@@ -31,6 +32,7 @@ class Agent:
             return True
         else:
             return False
+
 
 
 

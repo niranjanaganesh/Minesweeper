@@ -8,6 +8,8 @@ plt.show()"""
 import numpy as np
 import pygame
 
+from agent import Agent
+
 class Cell:
     def __init__(self, value, mine_value, state):
         self.value = value # number of mines adj to this cell
@@ -67,26 +69,26 @@ def open_cell(grid, row, col):
 
 def main():
 
-    # SETUP GRID
+    """""""""""""""""""""""""""""""GRID SETUP"""""""""""""""""""""""""""""""
+
     # Define some colors
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     GREEN = (0, 255, 0)
     BACKGROUND = (79, 159, 159)
     MAROON = (128, 0, 0)
-
     # This sets the WIDTH and HEIGHT of each grid location
     WIDTH = 40
     HEIGHT = 40
-
     # This sets the margin between each cell
     MARGIN = 5
-
     # Create a 2 dimensional array. A two dimensional
     # array is simply a list of lists.
     grid = []
+
     # Get dimension input
-    dim = int(input('Enter dimension: '))
+    #dim = int(input('Enter dimension: '))
+    dim = 5
 
     for row in range(dim):
         # Add an empty array that will hold each cell
@@ -117,7 +119,7 @@ def main():
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
 
-    # -------- Main Program Loop -----------
+    """""""""""""""""""""""""""""""MAIN PROGRAM LOOP"""""""""""""""""""""""""""""""
     while not done:
         # --- Main event loop
         for event in pygame.event.get():
@@ -175,6 +177,7 @@ def main():
                         display_image(screen, './images/8.png', (x, y))
                 x += 45
 
+                # This will only display a maroon cell for covered cells
                 if grid[row][col].state == False:
                     color = MAROON
                     pygame.draw.rect(screen,
@@ -183,10 +186,14 @@ def main():
                                       (MARGIN + HEIGHT) * row + MARGIN,
                                       WIDTH,
                                       HEIGHT])
+
             x = 5
             y += 45
 
-
+        #grid[0][0].state = True
+        # Interact with the agent here
+        agent = Agent(grid)
+        grid = agent.start()
 
         # --- Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
