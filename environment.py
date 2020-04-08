@@ -21,6 +21,7 @@ class Cell:
         self.safe_neighbors = 0 # num safe squares identified around it
         self.mine_neighbors = 0 # num mines identified around it
         self.hidden_neighbors = 0 # num hidden neighbors around it
+        self.is_flagged = False
 
     def __str__(self):
         cell_str = '{value: ' + str(self.value) + ', mine value: ' + str(self.mine_value) +\
@@ -28,16 +29,27 @@ class Cell:
         cell_props = '{is safe: ' + str(self.is_safe) + ', #sn: ' \
                      + str(self.safe_neighbors) + ', #mn: ' \
                      + str(self.mine_neighbors) + ', #hn: ' + str(self.hidden_neighbors) + '}'
-        return cell_str + '\n' + cell_props + '\n'
+        return '\n' + cell_str + '\n' + cell_props
 
 def print_grid(grid):
     dim = len(grid)
     for row in range(dim):
         for col in range(dim):
-            if grid[row][col].mine_value == 1:
-                print('M', end=' ')
+            if not grid[row][col].is_open:
+                print('X', end='  ')
             else:
-                print(str(grid[row][col].value), end=' ')
+                extra_char = ''
+                space = '  '
+                if grid[row][col].is_safe == 1:
+                    extra_char = '*'
+                    space = ' '
+                if grid[row][col].mine_value == 0:
+                    print(str(grid[row][col].value) + str(extra_char), end=space)
+                if grid[row][col].mine_value == 1:
+                    if grid[row][col].is_flagged:
+                        print('F', end=space)
+                    else:
+                        print('M', end=space)
         print('')
 
 
