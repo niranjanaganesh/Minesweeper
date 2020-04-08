@@ -11,15 +11,24 @@ import pygame
 from agent import Agent
 
 class Cell:
-    def __init__(self, value, mine_value, state):
+    def __init__(self, value, mine_value, is_open):
         self.value = value # number of mines adj to this cell
         self.mine_value = mine_value # 0 if not mine, 1 if mine
-        self.state = state # open or closed
+        self.is_open = is_open # true if open, false if closed
+
+        # properties that the agent updates on its board
+        self.is_safe = -1 # 0 if not, 1 if safe, -1 if hidden
+        self.safe_neighbors = 0 # num safe squares identified around it
+        self.mine_neighbors = 0 # num mines identified around it
+        self.hidden_neighbors = 0 # num hidden neighbors around it
 
     def __str__(self):
         cell_str = '{value: ' + str(self.value) + ', mine value: ' + str(self.mine_value) +\
-                   ', state: ' + str(self.state) + '}'
-        return cell_str
+                   ', state: ' + str(self.is_open) + '}'
+        cell_props = '{is safe: ' + str(self.is_safe) + ', #sn: ' \
+                     + str(self.safe_neighbors) + ', #mn: ' \
+                     + str(self.mine_neighbors) + ', #hn: ' + str(self.hidden_neighbors) + '}'
+        return cell_str + '\n' + cell_props + '\n'
 
 def print_grid(grid):
     dim = len(grid)
@@ -32,7 +41,8 @@ def print_grid(grid):
         print('')
 
 
-def update_values(grid):
+"""Updates the clue for each cell"""
+def update_clues(grid):
     # go to each mine
     # circle the mine
         # for each cell around the mine, if its not a mine itself
@@ -65,7 +75,7 @@ def display_image(screen, filename, xy):
     screen.blit(img, xy)
 
 def open_cell(grid, row, col):
-    grid[row][col].state = True
+    grid[row][col].is_open = True
 
 def main():
 
@@ -74,7 +84,6 @@ def main():
     # Define some colors
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
-    GREEN = (0, 255, 0)
     BACKGROUND = (79, 159, 159)
     MAROON = (128, 0, 0)
     # This sets the WIDTH and HEIGHT of each grid location
@@ -89,6 +98,7 @@ def main():
     # Get dimension input
     #dim = int(input('Enter dimension: '))
     dim = 5
+    total_mines = 0
 
     for row in range(dim):
         # Add an empty array that will hold each cell
@@ -99,10 +109,13 @@ def main():
                 cell = Cell(0, 0, False)
                 grid[row].append(cell)
             else:
-                cell = Cell(0, np.random.binomial(1, 0.125, 1), False)
+                num = np.random.binomial(1, 0.2, 1)
+                cell = Cell(0, num, False)
+                if num == 1:
+                    total_mines += 1
                 grid[row].append(cell)  # Append a cell
 
-    grid = update_values(grid)
+    grid = update_clues(grid)
     print_grid(grid)
 
     pygame.init()
@@ -178,7 +191,7 @@ def main():
                 x += 45
 
                 # This will only display a maroon cell for covered cells
-                if grid[row][col].state == False:
+                if grid[row][col].is_open == False:
                     color = MAROON
                     pygame.draw.rect(screen,
                                      color,
@@ -186,14 +199,15 @@ def main():
                                       (MARGIN + HEIGHT) * row + MARGIN,
                                       WIDTH,
                                       HEIGHT])
-
             x = 5
             y += 45
 
-        #grid[0][0].state = True
+        #grid[0][0].is_open = True
         # Interact with the agent here
-        agent = Agent(grid)
-        grid = agent.start()
+        agent = Agent(grid, total_mines)
+        #grid = agent.start()
+        agent.naive_solver()
+        done = True
 
         # --- Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
