@@ -97,7 +97,7 @@ def main():
 
     # Get dimension input
     #dim = int(input('Enter dimension: '))
-    dim = 5
+    dim = 3
     total_mines = 0
 
     for row in range(dim):

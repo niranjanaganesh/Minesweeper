@@ -26,30 +26,56 @@ class Agent:
         # generate list of cell position options
         cell_options = [(i, j) for i in np.arange(0,dim) for j in np.arange(0,dim)]
 
-        while num_visited_mines != self.total_mines:
+        while num_flagged_mines < self.total_mines or num_visited_mines < self.total_mines:
             # randomly select a cell
             if len(cell_options) == 0: # if cell options is empty
-                break;
+                break
             pos = random.choice(cell_options)
-            cell_options.remove(pos) # remove from list of options
+            cell_options.remove(pos)  # remove from list of options
             cell = self.env[pos[0]][pos[1]]
 
             # open cell
             cell.is_open = True
 
+            # if cell is not a mine
             if cell.mine_value == 0:
+                # mark cell as safe
+                cell.is_safe = 1
+
+                # if cell value can provide more clues
+                if cell.value == 0:  # when value is zero
+                    for n in self.get_neighbors(pos[0], pos[1]):  # all neighbors are safe
+                        n[0].is_safe = 1
+                        n[0].is_open = True
+
                 # gather info from nearby cells
                 self.gather_info(pos[0], pos[1])
-                print(cell)
-                print(pos[0], pos[1])
 
+                if cell.value - cell.mine_neighbors == cell.hidden_neighbors:
+                    for n in self.get_neighbors(pos[0], pos[1]):
+                        if n[0].is_safe == -1:
+                            n[0].mine_value = 1
+                            n[0].is_safe = 0
+                            n[0].is_open = True
+                            num_visited_mines += 1
+                            num_flagged_mines += 1
 
+                if (8-cell.value) - cell.safe_neighbors == cell.hidden_neighbors:
+                    for n in self.get_neighbors(pos[0], pos[1]):
+                        if n[0].is_safe == -1:
+                            n[0].is_safe = 1
+                            n[0].is_open = True
 
             # if cell is mine (and you exploded a mine)
-            else:
+            elif cell.mine_value == 1:
                 num_visited_mines += 1
-                cell.is_safe = 0;  # indicate cell is unsafe
+                cell.is_safe = 0  # indicate cell is unsafe
 
+            print(cell)
+            print(pos[0], pos[1])
+
+        print("number of flagged mines: " + str(num_flagged_mines))
+        print("number of total mines: " + str(self.total_mines))
 
         # while visited_mines != total_mines
             # randomly select a cell
@@ -60,7 +86,7 @@ class Agent:
                     # gather info
                     # if clue - mn == hn
                         # flag every hidden neighbor as mine
-                        # and set those neighbors to open
+                        # and set those neighbors to open/unsafe
                         # inc flagged_mines and visited mines
                     # if (8 - clue) - sn == hn
                         # mark every hidden neighbor as safe
@@ -69,19 +95,12 @@ class Agent:
                     # inc visited mines
                     # set is_safe to 0
 
-
-
-        # get neighbors
-        #neighbors = self.get_neighbors(0, 0)
-        #for n in neighbors:
-            #print(n[0], n[1])
-
     def gather_info(self, row, col):
         cell = self.env[row][col]
         for n in self.get_neighbors(row, col):
             if n[0].is_safe == 1:
                 cell.safe_neighbors += 1
-            if n[0].is_safe == 0:
+            elif n[0].is_safe == 0:
                 cell.mine_neighbors += 1
             else:
                 cell.hidden_neighbors += 1
