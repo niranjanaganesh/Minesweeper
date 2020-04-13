@@ -68,7 +68,6 @@ class Agent:
                 # gather info from nearby cells
                 self.gather_info(pos[0], pos[1])
 
-
                 if (cell.value - cell.mine_neighbors) == cell.hidden_neighbors:
                     for n in self.get_neighbors(pos[0], pos[1]):
                         if not n[0].is_open:
@@ -84,6 +83,8 @@ class Agent:
                         if n[0].is_open == False:
                             n[0].is_safe = 1
                             n[0].is_open = True
+
+
 
             # if cell is mine (and you exploded a mine)
             elif cell.mine_value == 1:
@@ -103,8 +104,6 @@ class Agent:
 
         print("number of flagged mines: " + str(num_flagged_mines))
         print("number of total mines: " + str(self.total_mines))
-
-
 
         # while visited_mines != total_mines
             # randomly select a cell

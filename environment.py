@@ -9,17 +9,19 @@ import numpy as np
 import pygame
 
 from agent import Agent
+from csp_agent import CSPAgent
 
 class Cell:
-    def __init__(self, value, mine_value, is_open):
-        self.value = value # number of mines adj to this cell
-        self.mine_value = mine_value # 0 if not mine, 1 if mine
-        self.is_open = is_open # true if open, false if closed
+    def __init__(self, value, mine_value, is_open, id):
+        self.value = value  # number of mines adj to this cell
+        self.mine_value = mine_value  # 0 if not mine, 1 if mine
+        self.is_open = is_open  # true if open, false if closed
+        self.id = id
 
         # properties that the agent updates on its board
-        self.is_safe = -1 # 0 if not, 1 if safe, -1 if hidden
-        self.safe_neighbors = 0 # num safe squares identified around it
-        self.mine_neighbors = 0 # num mines identified around it
+        self.is_safe = -1  # 0 if not, 1 if safe, -1 if hidden
+        self.safe_neighbors = 0  # num safe squares identified around it
+        self.mine_neighbors = 0  # num mines identified around it
         self.hidden_neighbors = 0 # num hidden neighbors around it
         self.is_flagged = False
 
@@ -98,6 +100,7 @@ def main():
     WHITE = (255, 255, 255)
     BACKGROUND = (79, 159, 159)
     MAROON = (128, 0, 0)
+    GREEN = (0, 128, 0)
     # This sets the WIDTH and HEIGHT of each grid location
     WIDTH = 40
     HEIGHT = 40
@@ -108,7 +111,7 @@ def main():
     grid = []
 
     # Get dimension input
-    #dim = int(input('Enter dimension: '))
+    # dim = int(input('Enter dimension: '))
     dim = 3
     total_mines = 0
 
@@ -117,12 +120,13 @@ def main():
         # in this row
         grid.append([])
         for column in range(dim):
+            cid = str(row) + '.' + str(column)
             if row == 0 and column == 0:
-                cell = Cell(0, 0, False)
+                cell = Cell(0, 0, False, cid)
                 grid[row].append(cell)
             else:
                 num = np.random.binomial(1, 0.2, 1)
-                cell = Cell(0, num, False)
+                cell = Cell(0, num, False, cid)
                 if num == 1:
                     total_mines += 1
                 grid[row].append(cell)  # Append a cell
@@ -203,8 +207,17 @@ def main():
                 x += 45
 
                 # This will only display a maroon cell for covered cells
-                if grid[row][col].is_open == False:
+                if not grid[row][col].is_open:
                     color = MAROON
+                    pygame.draw.rect(screen,
+                                     color,
+                                     [(MARGIN + WIDTH) * col + MARGIN,
+                                      (MARGIN + HEIGHT) * row + MARGIN,
+                                      WIDTH,
+                                      HEIGHT])
+
+                if grid[row][col].is_flagged:
+                    color = GREEN
                     pygame.draw.rect(screen,
                                      color,
                                      [(MARGIN + WIDTH) * col + MARGIN,
@@ -215,11 +228,16 @@ def main():
             y += 45
 
         #grid[0][0].is_open = True
+
         # Interact with the agent here
-        agent = Agent(grid, total_mines)
+        #agent = Agent(grid, total_mines)
         #grid = agent.start()
-        agent.naive_solver()
+        #grid = agent.naive_solver()
+
+        agent = CSPAgent(grid, total_mines)
+        agent.csp_solver()
         done = True
+
 
         # --- Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
